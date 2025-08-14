@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YenidoğuOkulları BaşakşehirKampüsü Rehberlik Zümresi - Görüşme Raporu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .student-stat { color: #3498db; }
+        .parent-stat { color: #e74c3c; }
+        .ratio-stat { color: #f39c12; }
+        
+        .chart-section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .top-students {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .student-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .student-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .student-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .student-details {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .recommendations {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .rec-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .rec-list li {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 5px solid #fff;
+        }
+        
+        .class-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .class-table th,
+        .class-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .class-table th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .class-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .highlight-max {
+            background: #e8f5e8 !important;
+            font-weight: bold;
+        }
+        
+        .highlight-min {
+            background: #ffeaa7 !important;
+            font-weight: bold;
+        }
+        
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-button:hover {
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+        
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 YenidoğuOkulları BaşakşehirKampüsü Rehberlik Zümresi</h1>
+            <p>2024-2025 Eğitim-Öğretim Yılı Öğrenci ve Veli Görüşme Raporu</p>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('genel')">Genel</button>
+                <button class="tab-button" onclick="showTab('merve')">Merve Arat Kuşcu</button>
+                <button class="tab-button" onclick="showTab('yasemin')">Yasemin Şevval Altan</button>
+                <button class="tab-button" onclick="showTab('meryem')">Meryem Balli</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div style="font-size: 2em; margin-bottom: 10px;">👥</div>
+                <div class="stat-number student-stat">119</div>
+                <div class="stat-label">Toplam Öğrenci</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em; margin-bottom: 10px;">🎓</div>
+                <div class="stat-number student-stat">617</div>
+                <div class="stat-label">Toplam Öğrenci Görüşmesi</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em; margin-bottom: 10px;">👨‍👩‍👧‍👦</div>
+                <div class="stat-number parent-stat">347</div>
+                <div class="stat-label">Toplam Veli Görüşmesi</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em; margin-bottom: 10px;">💬</div>
+                <div class="stat-number ratio-stat">964</div>
+                <div class="stat-label">Toplam Görüşme Sayısı</div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 class="section-title">📈 Dönemsel Görüşme Dağılımı</h2>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <canvas id="semesterChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 class="section-title">🏫 Sınıf Bazlı Görüşme Analizi</h2>
+            <div class="chart-container">
+                <canvas id="classChart"></canvas>
+            </div>
+            <table class="class-table">
+                <thead>
+                    <tr>
+                        <th>Sınıf</th>
+                        <th>Öğrenci Sayısı</th>
+                        <th>Öğrenci Görüşmesi</th>
+                        <th>Veli Görüşmesi</th>
+                        <th>Veli/Öğrenci Oranı</th>
+                        <th>Öğrenci Başına Ort.</th>
+                    </tr>
+                </thead>
+                <tbody id="classTableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="top-students">
+            <h2 class="section-title">⭐ Öne Çıkan Öğrenciler</h2>
+            <h3 style="color: #e74c3c; margin-bottom: 15px;">En Fazla Görüşme Yapılan Öğrenciler</h3>
+            <div class="student-list" id="topStudents"></div>
+            
+            <h3 style="color: #27ae60; margin-bottom: 15px; margin-top: 30px;">En Az Görüşme Yapılan Öğrenciler</h3>
+            <div class="student-list" id="bottomStudents"></div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 class="section-title">👨‍👩‍👧‍👦 Öğrenci-Veli Görüşme Oranı</h2>
+            <div class="chart-container">
+                <canvas id="parentChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 class="section-title">🔄 Yönlendirme Problemleri İstatistikleri</h2>
+            <div class="chart-container">
+                <canvas id="guidanceChart"></canvas>
+            </div>
+            <table class="class-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Yönlendirme Problemleri</th>
+                        <th>Yönlendirilen Öğrenci</th>
+                        <th>Yönlendirmeye Giden Öğrenci</th>
+                        <th>Yönlendirme Sonucunu Uygulayan Öğrenci</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>DEHB ve Duyuşsallık</strong></td>
+                        <td>12</td>
+                        <td>8</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Akran İlişkileri ve Davranış Problemleri</strong></td>
+                        <td>6</td>
+                        <td>3</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Sosyal Kaygı</strong></td>
+                        <td>5</td>
+                        <td>2</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Dikkat Eksikliği</strong></td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Dil ve Konuşma Bozukluğu</strong></td>
+                        <td>2</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Öğrenme Güçlüğü</strong></td>
+                        <td>2</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Ebeveyn İlişkileri</strong></td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Zorbalık Yapma</strong></td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding-left: 15px;"><strong>Sosyal Kaygı ve Dil Konuşma</strong></td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr style="background-color: #fff3cd; font-weight: bold;">
+                        <td style="text-align: left; padding-left: 15px;"><strong>TOPLAM</strong></td>
+                        <td><strong>34</strong></td>
+                        <td><strong>18</strong></td>
+                        <td><strong>13</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <h4 style="color: #2c3e50; margin-bottom: 10px;">📈 Yönlendirme Başarı Oranları:</h4>
+                <p><strong>Yönlendirmeye Gitme Oranı:</strong> %52.9 (18/34)</p>
+                <p><strong>Sonucu Uygulama Oranı:</strong> %38.2 (13/34)</p>
+                <p><strong>Takip Başarı Oranı:</strong> %72.2 (13/18)</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab fonksiyonları
+        function showTab(tabName) {
+            // Tüm tab içeriklerini gizle
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Tüm tab butonlarından active sınıfını kaldır
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            // Seçilen tabı göster
+            if (document.getElementById(tabName)) {
+                document.getElementById(tabName).classList.add('active');
+            }
+            event.target.classList.add('active');
+        }
+        
+        // Veri hazırlığı
+        const studentData = {
+            '1-A': { students: 24, studentMeetings: 109, parentMeetings: 57, participatingParents: 20 },
+            '1-B': { students: 23, studentMeetings: 93, parentMeetings: 68, participatingParents: 19 },
+            '1-C': { students: 23, studentMeetings: 63, parentMeetings: 39, participatingParents: 19 },
+            '1-D': { students: 24, studentMeetings: 137, parentMeetings: 64, participatingParents: 21 },
+            '2-B': { students: 25, studentMeetings: 215, parentMeetings: 119, participatingParents: 24 }
+        };
+        
+        // Toplam öğrenci sayısı: 24+23+23+24+25 = 119
+        
+        // Dönemsel dağılım grafiği
+        const semesterCtx = document.getElementById('semesterChart').getContext('2d');
+        new Chart(semesterCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['1. Dönem Öğrenci', '2. Dönem Öğrenci', '1. Dönem Veli', '2. Dönem Veli'],
+                datasets: [{
+                    data: [326, 291, 209, 138],
+                    backgroundColor: ['#3498db', '#5dade2', '#e74c3c', '#ec7063'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Dönemsel Görüşme Dağılımı',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Karşılaştırma grafiği
+        const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(comparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1. Dönem', '2. Dönem'],
+                datasets: [{
+                    label: 'Öğrenci Görüşmeleri',
+                    data: [326, 291],
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }, {
+                    label: 'Veli Görüşmeleri',
+                    data: [209, 138],
+                    backgroundColor: '#e74c3c',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Dönemsel Karşılaştırma',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Sınıf bazlı grafik
+        const classCtx = document.getElementById('classChart').getContext('2d');
+        new Chart(classCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(studentData),
+                datasets: [{
+                    label: 'Öğrenci Görüşmeleri',
+                    data: Object.values(studentData).map(d => d.studentMeetings),
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }, {
+                    label: 'Veli Görüşmeleri',
+                    data: Object.values(studentData).map(d => d.parentMeetings),
+                    backgroundColor: '#e74c3c',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sınıf Bazlı Görüşme Sayıları',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Öğrenci-Veli görüşme oranı grafiği
+        const parentCtx = document.getElementById('parentChart').getContext('2d');
+        new Chart(parentCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(studentData),
+                datasets: [{
+                    label: 'Öğrenci Görüşmeleri',
+                    data: Object.values(studentData).map(d => d.studentMeetings),
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }, {
+                    label: 'Veli Görüşmeleri',
+                    data: Object.values(studentData).map(d => d.parentMeetings),
+                    backgroundColor: '#e74c3c',
+                    borderRadius: 5
+                }, {
+                    label: 'Veli/Öğrenci Oranı (%)',
+                    data: Object.values(studentData).map(d => 
+                        ((d.parentMeetings / d.studentMeetings) * 100).toFixed(1)
+                    ),
+                    type: 'line',
+                    borderColor: '#f39c12',
+                    backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sınıf Bazlı Görüşme Karşılaştırması ve Veli/Öğrenci Oranı',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Görüşme Sayısı'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Oran (%)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+        
+        // Sınıf tablosunu doldur
+        const tableBody = document.getElementById('classTableBody');
+        let maxMeetings = 0, minMeetings = 1000, maxClass = '', minClass = '';
+        
+        Object.entries(studentData).forEach(([className, data]) => {
+            const meetingRatio = ((data.parentMeetings / data.studentMeetings) * 100).toFixed(1);
+            const avgPerStudent = (data.studentMeetings / data.students).toFixed(1);
+            
+            if (data.studentMeetings > maxMeetings) {
+                maxMeetings = data.studentMeetings;
+                maxClass = className;
+            }
+            if (data.studentMeetings < minMeetings) {
+                minMeetings = data.studentMeetings;
+                minClass = className;
+            }
+            
+            const row = document.createElement('tr');
+            if (className === maxClass) row.classList.add('highlight-max');
+            if (className === minClass) row.classList.add('highlight-min');
+            
+            row.innerHTML = `
+                <td>${className}</td>
+                <td>${data.students}</td>
+                <td>${data.studentMeetings}</td>
+                <td>${data.parentMeetings}</td>
+                <td>%${meetingRatio}</td>
+                <td>${avgPerStudent}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // En fazla görüşme yapılan öğrenciler
+        const topStudentsData = [
+            { name: 'ZEYNEP GÜREL', class: '2-B', studentMeetings: 22, parentMeetings: 9 },
+            { name: 'ARAS MİLLİ', class: '1-D', studentMeetings: 21, parentMeetings: 5 },
+            { name: 'SÜMEYYE SAYICI', class: '1-A', studentMeetings: 18, parentMeetings: 6 },
+            { name: 'AMİNE DURU KÜÇÜK', class: '2-B', studentMeetings: 17, parentMeetings: 6 },
+            { name: 'MUHAMMED HAMZA KAYGISIZ', class: '1-A', studentMeetings: 17, parentMeetings: 6 }
+        ];
+        
+        const bottomStudentsData = [
+            { name: 'OSMAN NURİ ALPAYDIN', class: '1-B', studentMeetings: 1, parentMeetings: 1 },
+            { name: 'YİĞİT SALİH YAZICI', class: '1-B', studentMeetings: 1, parentMeetings: 3 },
+            { name: 'NUR ALDAKER', class: '1-D', studentMeetings: 1, parentMeetings: 1 },
+            { name: 'ALP ASLAN ATAŞ', class: '1-C', studentMeetings: 1, parentMeetings: 1 },
+            { name: 'ZÜLAL ALPAYDIN', class: '2-B', studentMeetings: 1, parentMeetings: 1 }
+        ];
+        
+        function createStudentCards(students, containerId) {
+            const container = document.getElementById(containerId);
+            students.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-item';
+                card.innerHTML = `
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-details">
+                        ${student.class} Sınıfı<br>
+                        Öğrenci: ${student.studentMeetings} görüşme<br>
+                        Veli: ${student.parentMeetings} görüşme
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Yönlendirme problemleri grafiği
+        const guidanceCtx = document.getElementById('guidanceChart').getContext('2d');
+        new Chart(guidanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['DEHB ve Duyuşsallık', 'Akran İlişkileri', 'Sosyal Kaygı', 'Dikkat Eksikliği', 'Dil-Konuşma Boz.', 'Öğrenme Güçlüğü', 'Ebeveyn İlişkileri', 'Zorbalık', 'Sosyal K.-Dil K.'],
+                datasets: [{
+                    label: 'Yönlendirilen Öğrenci',
+                    data: [12, 6, 5, 3, 2, 2, 2, 1, 1],
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }, {
+                    label: 'Yönlendirmeye Giden',
+                    data: [8, 3, 2, 3, 1, 1, 0, 0, 0],
+                    backgroundColor: '#f39c12',
+                    borderRadius: 5
+                }, {
+                    label: 'Sonucu Uygulayan',
+                    data: [6, 3, 2, 1, 1, 0, 0, 0, 0],
+                    backgroundColor: '#27ae60',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Yönlendirme Problemleri ve Takip Durumu',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Öğrenci Sayısı'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Problem Türleri'
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+        
+        createStudentCards(topStudentsData, 'topStudents');
+        createStudentCards(bottomStudentsData, 'bottomStudents');
+    </script>
+</body>
+</html>
+        
